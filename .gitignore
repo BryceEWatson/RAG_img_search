@@ -1,0 +1,30 @@
+# Dependencies
+node_modules/
+
+# Environment
+.env
+*.env.local
+
+# Docker
+docker-compose.override.yml
+
+# Logs
+*.log
+logs/
+
+# Editor/IDE
+.vscode/
+.idea/
+
+# Build artifacts
+/dist
+
+# Testing
+/test-results/
+
+# Redis data
+data/
+
+# Temporary files
+*.tmp
+*.temp

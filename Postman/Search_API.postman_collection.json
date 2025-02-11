@@ -1,0 +1,94 @@
+{
+  "info": {
+    "name": "Image Search API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Search by Text",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "exec": [
+              "if (!pm.environment.get('search_text') || pm.environment.get('search_text').startsWith('%')) {",
+              "    const adjective = pm.variables.replaceIn('{{$randomAdjective}}');",
+              "    const noun = pm.variables.replaceIn('{{$randomNoun}}');",
+              "    pm.environment.set('search_text', `${adjective} ${noun}`);",
+              "}",
+              "",
+              "if (!pm.environment.get('search_limit') || isNaN(pm.environment.get('search_limit'))) {",
+              "    pm.environment.set('search_limit', 5);",
+              "}"
+            ],
+            "type": "text/javascript"
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "exec": [
+              "pm.test('Search Results', () => {",
+              "    console.log('Search Query:', pm.environment.get('search_text'));",
+              "    const response = pm.response.json();",
+              "    console.log('Results:', JSON.stringify(response, null, 2));",
+              "",
+              "    if (response.error) {",
+              "        console.log('Error:', response.message);",
+              "        return;",
+              "    }",
+              "",
+              "    pm.expect(response).to.be.an('array');",
+              "    if (response.length > 0) {",
+              "        pm.expect(response[0]).to.have.all.keys(['id', 'metadata', 'distance']);",
+              "    }",
+              "});"
+            ],
+            "type": "text/javascript"
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"text\": \"{{search_text}}\",\n  \"limit\": {{search_limit}}\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/search"
+      }
+    },
+    {
+      "name": "Search by Image ID",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"imageId\": \"{{seeded_image_id}}\",\n  \"limit\": 3\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        },
+        "url": "{{base_url}}/search"
+      }
+    }
+  ]
+}
