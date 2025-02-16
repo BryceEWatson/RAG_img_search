@@ -1,38 +1,100 @@
 import { createClient } from 'redis';
 import dotenv from 'dotenv';
-
 dotenv.config();
 
-const redisClient = createClient({
-  url: process.env.REDIS_URL
-});
-
-async function listVectors() {
+async function viewVectors() {
+  console.log('🔌 Connecting to Redis...');
+  const client = createClient({ url: process.env.REDIS_URL });
+  client.on('error', err => console.error('Redis Client Error:', err));
+  
   try {
-    await redisClient.connect();
+    await client.connect();
+    console.log('✅ Connected to Redis\n');
     
-    // Search all vectors in the index
-    const results = await redisClient.ft.search('images_idx', '*', {
-      LIMIT: { from: 0, size: 50 },
-      RETURN: ['metadata', 'embedding']
+    // Verify index exists and get info
+    try {
+      const indexInfo = await client.ft.info('images_idx');
+      console.log('📊 Index Information:');
+      console.log('- Name:', indexInfo.indexName);
+      console.log('- Total Documents:', indexInfo.numDocs);
+      console.log('- Fields:', indexInfo.attributes.map(f => f.identifier).join(', '));
+      console.log(''); // Empty line for spacing
+    } catch (error) {
+      if (error.message.includes('no such index')) {
+        console.error('❌ Index "images_idx" not found. Please run generate:test-cases first.');
+        return;
+      }
+      throw error;
+    }
+    
+    // Get Redis keyspace info
+    const info = await client.info('keyspace');
+    const keyCount = info.match(/db0:keys=(\d+)/)?.[1] || 0;
+    console.log('📈 Redis Stats:');
+    console.log('- Total Keys:', keyCount);
+    console.log(''); // Empty line for spacing
+    
+    // Search entire vector index with pagination
+    const results = await client.ft.search('images_idx', '*', {
+      LIMIT: { from: 0, size: 1000 },
+      RETURN: ['$', '$.description', '$.category', '$.attributes']
     });
 
-    console.log(`Found ${results.total} vector entries:\n`);
-    results.documents.forEach((doc, index) => {
-      console.log(`Entry ${index + 1}:`);
-      console.log(`Key: ${doc.id}`);
-      console.log(`Metadata: ${doc.value.metadata}`);
-      console.log(`Embedding exists: ${!!doc.value.embedding ? 'Yes' : 'Missing'}`);
+    if (results.total === 0) {
+      console.log('❌ No documents found in index');
+      return;
+    }
+
+    console.log(`🔍 Found ${results.total} vector entries:\n`);
+    
+    // Show sample documents (first 3)
+    const sampleSize = Math.min(3, results.total);
+    console.log(`📑 Showing ${sampleSize} sample documents:\n`);
+    
+    for (let i = 0; i < sampleSize; i++) {
+      const doc = results.documents[i];
+      const value = JSON.parse(doc.value.$);
+      console.log(`📄 Document ${i + 1}/${sampleSize}: ${doc.id}`);
+      console.log(`📝 Description: ${value.description}`);
+      console.log(`🏷️  Category: ${value.category || 'general'}`);
+      console.log('📊 Attributes:');
+      (value.attributes || []).forEach(attr => {
+        console.log(`  - ${attr.category}: ${attr.value} (prominence: ${attr.prominence.toFixed(2)})`);
+      });
       console.log('---\n');
+    }
+
+    // Print summary statistics
+    const categories = new Map();
+    const attributeTypes = new Map();
+    
+    results.documents.forEach(doc => {
+      const value = JSON.parse(doc.value.$);
+      categories.set(value.category || 'general', (categories.get(value.category || 'general') || 0) + 1);
+      (value.attributes || []).forEach(attr => {
+        attributeTypes.set(attr.category, (attributeTypes.get(attr.category) || 0) + 1);
+      });
+    });
+    
+    console.log('📊 Document Statistics:');
+    console.log('Categories Distribution:');
+    categories.forEach((count, category) => {
+      console.log(`  - ${category}: ${count} documents (${(count/results.total*100).toFixed(1)}%)`);
+    });
+    
+    console.log('\nAttribute Types Distribution:');
+    attributeTypes.forEach((count, type) => {
+      console.log(`  - ${type}: ${count} occurrences`);
     });
 
-    const withEmbeddings = results.documents.filter(d => d.value.embedding).length;
-    console.log(`Embedding presence: ${withEmbeddings}/${results.total} entries have embeddings`);
   } catch (error) {
-    console.error('Error listing vectors:', error);
+    console.error('❌ Error viewing vectors:', error);
   } finally {
-    await redisClient.quit();
+    await client.quit();
   }
 }
 
-listVectors();
+// Run if called directly
+if (import.meta.url === `file://${process.argv[1]}`) {
+  viewVectors().catch(console.error);
+}

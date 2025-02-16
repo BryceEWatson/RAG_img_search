@@ -8,7 +8,7 @@ services:
     volumes:
       - redis_data:/data
     networks:
-      - rag-network
+      - app-network
     deploy:
       resources:
         limits:
@@ -17,8 +17,8 @@ services:
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
       interval: 5s
-      timeout: 10s
-      retries: 10
+      timeout: 30s
+      retries: 3
       start_period: 30s
 
   api:
@@ -38,7 +38,7 @@ services:
       redis:
         condition: service_healthy
     networks:
-      - rag-network
+      - app-network
     deploy:
       resources:
         limits:
@@ -54,5 +54,5 @@ volumes:
   redis_data:
 
 networks:
-  rag-network:
+  app-network:
     driver: bridge

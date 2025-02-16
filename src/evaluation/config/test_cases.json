@@ -1,0 +1,218 @@
+{
+  "testCases": [
+    {
+      "query": "Find high-resolution photos of neoclassical government buildings",
+      "expectedAnswer": {
+        "requiredElements": ["columns", "domed roofs", "symmetrical design"],
+        "excludedElements": ["modern materials", "skyscrapers"]
+      },
+      "retrievedDocuments": [
+        {
+          "id": "img_1987",
+          "description": "Neoclassical courthouse with Corinthian columns and marble facade, 24MP resolution",
+          "category": "government architecture",
+          "embedding": [0.85, 0.72],
+          "relevanceScore": 0.92,
+          "attributes": [
+            {
+              "category": "style",
+              "value": "neoclassical_architecture",
+              "context": "Main facade shows classical Greek elements",
+              "prominence": 0.95,
+              "reasoning": "Columns and pediment match neoclassical principles"
+            },
+            {
+              "category": "object",
+              "value": "corinthian_columns",
+              "context": "Prominent columns along the front facade",
+              "prominence": 0.9,
+              "reasoning": "Detailed Corinthian capitals clearly visible"
+            },
+            {
+              "category": "material",
+              "value": "marble_facade",
+              "context": "Exterior walls and architectural elements",
+              "prominence": 0.85,
+              "reasoning": "Light-colored, polished stone characteristic of marble"
+            }
+          ],
+          "analysisMetadata": {
+            "modelVersion": "claude-3-5-sonnet-20240620",
+            "analysisDate": "2025-02-15T13:46:04-08:00",
+            "mimeType": "image/webp",
+            "resolution": "24MP"
+          }
+        },
+        {
+          "id": "img_2011",
+          "description": "Modern parliament building with glass exterior mixed with stone elements",
+          "category": "modern government",
+          "embedding": [0.68, 0.79],
+          "relevanceScore": 0.65,
+          "attributes": [
+            {
+              "category": "style",
+              "value": "modern_architecture",
+              "context": "Contemporary design with mixed materials",
+              "prominence": 0.85,
+              "reasoning": "Blend of traditional and modern elements"
+            },
+            {
+              "category": "material",
+              "value": "glass_facade",
+              "context": "Large glass panels on exterior",
+              "prominence": 0.8,
+              "reasoning": "Transparent surfaces dominate the design"
+            },
+            {
+              "category": "composition",
+              "value": "geometric_pattern",
+              "context": "Regular grid of windows and panels",
+              "prominence": 0.75,
+              "reasoning": "Structured arrangement of architectural elements"
+            }
+          ],
+          "analysisMetadata": {
+            "modelVersion": "claude-3-5-sonnet-20240620",
+            "analysisDate": "2025-02-15T13:46:04-08:00",
+            "mimeType": "image/webp",
+            "resolution": "20MP"
+          }
+        }
+      ],
+      "generatedAnswer": "Here are neoclassical government buildings featuring traditional columns and domed roofs, though some results show modern interpretations with glass elements.",
+      "evaluationFocus": ["faithfulness", "relevance"]
+    },
+    {
+      "query": "Show me aerial views of coastal ecosystems with visible wildlife",
+      "expectedAnswer": {
+        "requiredElements": ["aerial perspective", "coastline", "animal figures"],
+        "excludedElements": ["urban development", "close-up shots"]
+      },
+      "retrievedDocuments": [
+        {
+          "id": "img_3022",
+          "description": "Drone shot of mangrove coastline with visible bird flocks, 20MP",
+          "category": "coastal ecology",
+          "embedding": [0.91, 0.83],
+          "relevanceScore": 0.88,
+          "attributes": [
+            {
+              "category": "ecosystem",
+              "value": "mangrove_forest",
+              "context": "Tangled network of mangrove trees along the coast",
+              "prominence": 0.9,
+              "reasoning": "Distinctive root system and dense foliage"
+            },
+            {
+              "category": "object",
+              "value": "bird_flocks",
+              "context": "Groups of birds flying over the coastline",
+              "prominence": 0.85,
+              "reasoning": "Multiple birds visible in the aerial view"
+            },
+            {
+              "category": "perspective",
+              "value": "aerial_view",
+              "context": "Overhead view of the coastline",
+              "prominence": 0.95,
+              "reasoning": "Bird's-eye view of the coastal ecosystem"
+            }
+          ],
+          "analysisMetadata": {
+            "modelVersion": "claude-3-5-sonnet-20240620",
+            "analysisDate": "2025-02-15T13:40:28-08:00",
+            "mimeType": "image/webp",
+            "resolution": "20MP"
+          }
+        },
+        {
+          "id": "img_3023",
+          "description": "Satellite image of urban beach development project",
+          "category": "coastal urban",
+          "embedding": [0.45, 0.62],
+          "relevanceScore": 0.42,
+          "attributes": [
+            {
+              "category": "land_use",
+              "value": "urban_development",
+              "context": "Beachfront area with buildings and infrastructure",
+              "prominence": 0.8,
+              "reasoning": "Presence of buildings, roads, and other urban features"
+            },
+            {
+              "category": "object",
+              "value": "buildings",
+              "context": "Structures along the beachfront",
+              "prominence": 0.75,
+              "reasoning": "Multiple buildings visible in the satellite image"
+            },
+            {
+              "category": "composition",
+              "value": "grid_pattern",
+              "context": "Regular arrangement of buildings and roads",
+              "prominence": 0.7,
+              "reasoning": "Structured layout of urban development"
+            }
+          ],
+          "analysisMetadata": {
+            "modelVersion": "claude-3-5-sonnet-20240620",
+            "analysisDate": "2025-02-15T13:40:28-08:00",
+            "mimeType": "image/webp",
+            "resolution": "15MP"
+          }
+        }
+      ],
+      "generatedAnswer": "These coastal aerial views focus on natural ecosystems, though some results show urbanized areas which should be ignored.",
+      "evaluationFocus": ["accuracy", "novelty"],
+      "hallucinationCheck": {
+        "present": false,
+        "flaggedElements": []
+      }
+    },
+    {
+      "query": "Find modern skyscrapers with glass facades",
+      "expectedAnswer": {
+        "requiredElements": ["glass", "steel", "high-rise"],
+        "excludedElements": ["historic", "brick"]
+      },
+      "retrievedDocuments": [],
+      "generatedAnswer": "",
+      "evaluationFocus": []
+    },
+    {
+      "query": "Show me tropical beaches with palm trees",
+      "expectedAnswer": {
+        "requiredElements": ["sand", "palm trees", "ocean"],
+        "excludedElements": ["people", "buildings"]
+      },
+      "retrievedDocuments": [],
+      "generatedAnswer": "",
+      "evaluationFocus": []
+    },
+    {
+      "query": "Find historic European castles",
+      "expectedAnswer": {
+        "requiredElements": ["stone walls", "turrets", "moat"],
+        "excludedElements": ["modern", "concrete"]
+      },
+      "retrievedDocuments": [],
+      "generatedAnswer": "",
+      "evaluationFocus": []
+    }
+  ],
+  "metadata": {
+    "dataVersion": "2.1",
+    "creationDate": "2025-02-15",
+    "testCasePurposes": [
+      "Evaluate relevance of image retrieval",
+      "Test attribute matching",
+      "Verify category classification"
+    ],
+    "analysisMetadata": {
+      "modelVersion": "claude-3-5-sonnet-20240620",
+      "analysisDate": "2025-02-15T13:40:28-08:00",
+      "mimeType": "image/webp"
+    }
+  }
+}

@@ -23,19 +23,24 @@
     "test:api:report": "newman run Postman/Search_API.postman_collection.json -e Postman/local.postman_environment.json --reporters cli,json --reporter-json-export test-results/api-report.json",
     "//search:example": "Example: npm run search --text=\"colorful landscape\"",
     "search": "cross-env-shell newman run Postman/Search_API.postman_collection.json -e Postman/local.postman_environment.json --env-var \"search_text=%npm_config_text%\" --env-var \"search_limit=${npm_config_limit:-5}\"",
-    "search:verbose": "cross-env-shell newman run Postman/Search_API.postman_collection.json -e Postman/local.postman_environment.json --env-var \"search_text=%npm_config_text%\" --env-var \"search_limit=%npm_config_limit%\" --reporters cli --reporter-cli-verbose"
+    "search:verbose": "cross-env-shell newman run Postman/Search_API.postman_collection.json -e Postman/local.postman_environment.json --env-var \"search_text=%npm_config_text%\" --env-var \"search_limit=%npm_config_limit%\" --reporters cli --reporter-cli-verbose",
+    "generate:test-cases": "node scripts/generateTestCases.js",
+    "evaluate": "npm run generate:test-cases && node src/evaluation/evaluateRagas.js",
+    "validate": "node scripts/validateData.js"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.2",
     "@fastify/rate-limit": "^10.2.2",
     "@fastify/swagger": "^9.4.2",
     "@fastify/swagger-ui": "^5.2.1",
+    "ajv": "^8.12.0",
     "axios": "^1.7.9",
     "cli-progress": "^3.12.0",
     "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
     "openai": "^4.83.0",
-    "redis": "^4.7.0"
+    "redis": "^4.7.0",
+    "@redis/vector": "^0.3.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
