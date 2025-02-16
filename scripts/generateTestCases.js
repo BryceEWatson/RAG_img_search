@@ -8,6 +8,15 @@ import dotenv from 'dotenv';
 
 dotenv.config();
 
+// Validate required environment variables
+const requiredEnvVars = ['REDIS_URL', 'OPENAI_API_KEY', 'BATCH_SIZE'];
+requiredEnvVars.forEach(varName => {
+  if (!process.env[varName]) {
+    throw new Error(`Missing required environment variable: ${varName}`);
+  }
+});
+console.log('✅ Environment variables validated');
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
@@ -17,6 +26,10 @@ const stats = {
   categories: new Map(),
   attributeTypes: new Map()
 };
+
+// Add startup banner
+console.log('🚀 Starting test case generation');
+console.log(`⚙️  Configuration: \n  Redis URL: ${process.env.REDIS_URL}\n  Batch Size: ${process.env.BATCH_SIZE}\n  OpenAI Key: ${process.env.OPENAI_API_KEY ? '*****' + process.env.OPENAI_API_KEY.slice(-4) : 'MISSING'}\n`);
 
 // Initialize Redis client with index creation
 async function initializeRedis() {
@@ -136,6 +149,11 @@ async function generateRelevantDocuments(query, expectedAnswer, count = 3, redis
     docs.push(doc);
   }
   
+  // Add debug output for empty batches
+  if (docs.length === 0) {
+    console.log('⚠️  No relevant docs generated for query:', query);
+  }
+  
   return docs;
 }
 
@@ -178,14 +196,14 @@ async function implementTestCases() {
   const redisClient = await initializeRedis();
   
   console.log('🏗️ Generating and storing test documents...');
-  const totalDocuments = existingCases.testCases.length * 8;
+  const totalBatches = existingCases.testCases.length;
   const progressBar = new cliProgress.SingleBar({
-    format: 'Generating Documents |{bar}| {percentage}% | {value}/{total} docs',
-    barCompleteChar: '█',
-    barIncompleteChar: '░',
+    format: '📦 Progress | {bar} | {percentage}% | {value}/{total} batches',
+    barCompleteChar: '\u2588',
+    barIncompleteChar: '\u2591',
     hideCursor: true
   });
-  progressBar.start(totalDocuments, 0);
+  progressBar.start(totalBatches, 0);
   
   try {
     const implementedCases = {
@@ -212,7 +230,7 @@ async function implementTestCases() {
           redisClient
         );
         
-        progressBar.increment(relevantDocs.length + lessRelevantDocs.length);
+        progressBar.increment(1);
         
         return {
           ...testCase,
@@ -262,8 +280,9 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   }
   try {
     await main();
+    console.log('\n🎉 Successfully generated test cases');
   } catch (error) {
-    console.error('Generation failed:', error);
+    console.error('\n❌ Generation failed:', error);
     process.exit(1);
   }
 }

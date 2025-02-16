@@ -8,9 +8,9 @@
     "//seed-params": "count: items to generate, batchSize: items per batch, preserveData: keep existing, useRealEmbeddings: use OpenAI API",
     "//seed:example-preserve": "Example with OpenAI embeddings: npm run seed -- 200 50 false true",
     "//seed:example-random": "Example with random vectors: npm run seed -- 200 50 false false",
-    "seed": "node scripts/seedData.js",
-    "seed:clear": "node scripts/seedData.js 0 1 true",
-    "seed:view": "node scripts/viewVectors.js",
+    "seed": "docker exec rag_img_search-api-1 node scripts/seedData.js",
+    "seed:clear": "docker exec rag_img_search-api-1 node scripts/seedData.js 0 1 true",
+    "seed:view": "docker exec rag_img_search-api-1 node scripts/viewVectors.js",
     "start": "node server.js",
     "docker:start": "docker-compose up --build -d",
     "docker:stop": "docker-compose down",
@@ -19,14 +19,13 @@
     "docker:logs": "docker-compose logs -f",
     "dev": "node --watch server.js",
     "test:api": "newman run Postman/Search_API.postman_collection.json -e Postman/local.postman_environment.json",
-    "test:api:ci": "npm run seed:clear && npm run seed -- 100 50 false false && npm run test:api:report",
+    "test:api:ci": "docker exec rag_img_search-api-1 node scripts/seedData.js 0 1 true && docker exec rag_img_search-api-1 node scripts/seedData.js 100 50 false false && npm run test:api:report",
     "test:api:report": "newman run Postman/Search_API.postman_collection.json -e Postman/local.postman_environment.json --reporters cli,json --reporter-json-export test-results/api-report.json",
-    "//search:example": "Example: npm run search --text=\"colorful landscape\"",
     "search": "cross-env-shell newman run Postman/Search_API.postman_collection.json -e Postman/local.postman_environment.json --env-var \"search_text=%npm_config_text%\" --env-var \"search_limit=${npm_config_limit:-5}\"",
     "search:verbose": "cross-env-shell newman run Postman/Search_API.postman_collection.json -e Postman/local.postman_environment.json --env-var \"search_text=%npm_config_text%\" --env-var \"search_limit=%npm_config_limit%\" --reporters cli --reporter-cli-verbose",
-    "generate:test-cases": "node scripts/generateTestCases.js",
-    "evaluate": "npm run generate:test-cases && node src/evaluation/evaluateRagas.js",
-    "validate": "node scripts/validateData.js"
+    "generate:test-cases": "docker exec rag_img_search-api-1 node scripts/generateTestCases.js",
+    "evaluate": "docker exec rag_img_search-api-1 node scripts/generateTestCases.js && docker exec rag_img_search-api-1 node src/evaluation/evaluateRagas.js",
+    "validate": "docker exec rag_img_search-api-1 node scripts/validateData.js"
   },
   "dependencies": {
     "@fastify/cors": "^10.0.2",
@@ -39,8 +38,7 @@
     "dotenv": "^16.4.7",
     "fastify": "^5.2.1",
     "openai": "^4.83.0",
-    "redis": "^4.7.0",
-    "@redis/vector": "^0.3.0"
+    "redis": "^4.7.0"
   },
   "devDependencies": {
     "cross-env": "^7.0.3",
